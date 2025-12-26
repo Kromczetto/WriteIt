@@ -1,24 +1,29 @@
 import { useState } from 'react'
 import axios from 'axios'
+import { toast } from 'react-hot-toast'
 
 const Register = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError(null)
     setLoading(true)
 
     try {
       await axios.post('/register', {
-        email,
-        password,
+        email: email.trim().toLowerCase(),
+        password: password.trim(),
       })
-    } catch (err) {
-      setError('Rejestracja nie powiodła się')
+
+      toast.success('Registration successful')
+      setEmail('')
+      setPassword('')
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message || 'Registration failed'
+      )
     } finally {
       setLoading(false)
     }
@@ -26,7 +31,7 @@ const Register = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Rejestracja</h2>
+      <h2>Register</h2>
 
       <div>
         <label>Email</label>
@@ -39,7 +44,7 @@ const Register = () => {
       </div>
 
       <div>
-        <label>Hasło</label>
+        <label>Password</label>
         <input
           type="password"
           value={password}
@@ -48,10 +53,8 @@ const Register = () => {
         />
       </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
       <button type="submit" disabled={loading}>
-        {loading ? 'Rejestrowanie...' : 'Zarejestruj'}
+        {loading ? 'Registering...' : 'Register'}
       </button>
     </form>
   )

@@ -9,6 +9,6 @@ router.use(cors({
 }));
 
 router.get("/", test)
-router.get("/register", registerUser)
+router.post("/register", registerUser)
 
 module.exports = router;
