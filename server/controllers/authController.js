@@ -37,4 +37,36 @@ const registerUser = async (req, res) => {
       }
       
 }
-module.exports = { test, registerUser };
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+
+    if (!user) {
+      return res.status(400).json({ message: "No user found" });
+    }
+
+    const match = await comparePassword(password, user.password);
+  
+    if (!match) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+    
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        email: user.email,
+      },
+    });
+  } catch(error) {
+    console.error('LOGIN ERROR:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+
+}
+
+module.exports = { test, registerUser, loginUser };
