@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const { hashPassword, comparePassword } = require('../services/auth');
+const jwt = require('jsonwebtoken');
 
 const test = (req, res) => {    
     res.json({ message: "Auth route is working!" });
@@ -43,30 +44,53 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-
-
     if (!user) {
       return res.status(400).json({ message: "No user found" });
     }
 
     const match = await comparePassword(password, user.password);
-  
     if (!match) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    
-    res.status(200).json({
-      message: 'Login successful',
-      user: {
-        id: user._id,
-        email: user.email,
-      },
-    });
-  } catch(error) {
+
+    const token = jwt.sign(
+      { email: user.email, id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: false,        
+        sameSite: 'lax',    
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+      .status(200)
+      .json({
+        message: 'Login successful',
+        user: {
+          id: user._id,
+          email: user.email,
+        },
+      });
+
+  } catch (error) {
     console.error('LOGIN ERROR:', error);
     res.status(500).json({ message: 'Server error' });
   }
+};
 
+const getProfile = async (req, res) => {
+  const { token } = req.cookies;
+  if(token) {
+      jwt.verify(token, process.env.JWT_SECRET, {}, async (err, user) => {
+        if(err) throw err;
+        res.json(user);
+      })
+  } else {
+      res.status(401).json({ message: "Unauthorized" });
+  }
 }
 
-module.exports = { test, registerUser, loginUser };
+module.exports = { test, registerUser, loginUser, getProfile };
