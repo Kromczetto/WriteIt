@@ -15,7 +15,7 @@ const Login = () => {
     setLoading(true)
 
     try {
-      await axios.post('/login', {
+      await axios.post('/auth/login', {
         email: email.trim().toLowerCase(),
         password: password.trim(),
       })

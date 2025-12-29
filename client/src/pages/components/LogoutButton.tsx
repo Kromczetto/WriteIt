@@ -13,7 +13,7 @@ const LogoutButton = () => {
 
   const logout = async () => {
     try {
-      await axios.post('/logout', {}, { withCredentials: true });
+      await axios.post('/auth/logout', {}, { withCredentials: true });
       setUser(null);
       navigate('/login');
     } catch (error) {

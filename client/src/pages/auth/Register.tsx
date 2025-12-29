@@ -12,7 +12,7 @@ const Register = () => {
     setLoading(true)
 
     try {
-      await axios.post('/register', {
+      await axios.post('/auth/register', {
         email: email.trim().toLowerCase(),
         password: password.trim(),
       })

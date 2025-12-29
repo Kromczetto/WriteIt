@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import { UserProvider } from './context/userContext';
 import AppRouter from './AppRouter';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.withCredentials = true;

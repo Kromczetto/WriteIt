@@ -18,7 +18,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     axios
-      .get('/profile', { withCredentials: true })
+      .get('/auth/profile', { withCredentials: true })
       .then(({ data }) => {
         setUser(data);
       })
