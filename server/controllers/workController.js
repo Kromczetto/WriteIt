@@ -21,4 +21,19 @@ const createWork = async (req, res) => {
     }
 }
 
-module.exports = { createWork };
+const getWorks = async (req, res) => {
+    try {
+        res.set('Cache-Control', 'no-store');
+
+        const works = await Work.find()
+        .populate('author', 'email')
+        .sort({ createdAt: -1 });
+
+        res.status(200).json(works);
+    } catch(error) {
+        console.log("GET WORKS ERROR:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
+module.exports = { createWork, getWorks };
