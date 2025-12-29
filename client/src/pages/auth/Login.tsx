@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -21,6 +23,7 @@ const Login = () => {
       toast.success('Login successful')
       setEmail('')
       setPassword('')
+      navigate('/profile')
     } catch (err: any) {
       toast.error(
         err?.response?.data?.message || 'Login failed'
@@ -57,6 +60,7 @@ const Login = () => {
       <button type="submit" disabled={loading}>
         {loading ? 'Login...' : 'Login'}
       </button>
+      
     </form>
   )
 }
