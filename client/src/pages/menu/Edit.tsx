@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
+import '../../css/Edit.css';
 
 const Edit = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const Edit = () => {
   };
 
   return (
-    <div>
+    <div className="editor-container">
       <h1>Edit</h1>
 
       <input value={title} onChange={e => setTitle(e.target.value)} />

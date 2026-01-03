@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import '../../css/Store.css';
 
 type Work = {
   _id: string;
   title: string;
-  status: string;
-  author?: {
-    email: string;
-  };
+  author?: { email: string };
 };
 
 const Store = () => {
@@ -21,12 +19,14 @@ const Store = () => {
     <div>
       <h1>Store</h1>
 
-      {works.map(work => (
-        <div key={work._id} style={{ marginBottom: '1rem' }}>
-          <h2>{work.title}</h2>
-          <p>Author: {work.author?.email}</p>
-        </div>
-      ))}
+      <div className="store-grid">
+        {works.map(work => (
+          <div key={work._id} className="store-card">
+            <h2>{work.title}</h2>
+            <p>{work.author?.email}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

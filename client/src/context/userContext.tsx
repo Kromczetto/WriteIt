@@ -15,17 +15,29 @@ export const UserContext = createContext<UserContextType | null>(null);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     axios
-      .get('/auth/profile', { withCredentials: true })
+      .get('/auth/me')
       .then(({ data }) => {
-        setUser(data);
+        if (!cancelled) setUser(data);
       })
       .catch(() => {
-        setUser(null);
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  if (loading) return null; 
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

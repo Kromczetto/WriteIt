@@ -1,36 +1,35 @@
-import { useState } from 'react'
-import axios from 'axios'
-import { toast } from 'react-hot-toast'
+import { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import '../../css/Auth.css';
 
 const Register = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       await axios.post('/auth/register', {
         email: email.trim().toLowerCase(),
         password: password.trim(),
-      })
+      });
 
-      toast.success('Registration successful')
-      setEmail('')
-      setPassword('')
+      toast.success('Registration successful');
+      setEmail('');
+      setPassword('');
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || 'Registration failed'
-      )
+      toast.error(err?.response?.data?.message || 'Registration failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Register</h2>
 
       <div>
@@ -38,7 +37,7 @@ const Register = () => {
         <input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           required
         />
       </div>
@@ -48,7 +47,7 @@ const Register = () => {
         <input
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           required
         />
       </div>
@@ -57,7 +56,7 @@ const Register = () => {
         {loading ? 'Registering...' : 'Register'}
       </button>
     </form>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

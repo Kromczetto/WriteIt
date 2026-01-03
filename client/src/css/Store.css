@@ -1,0 +1,21 @@
+.store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .store-card {
+    background: white;
+    padding: 1.2rem;
+    border-radius: 10px;
+    transition: transform 0.15s ease;
+  }
+  
+  .store-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .store-card h2 {
+    margin-top: 0;
+  }
+  

@@ -81,27 +81,33 @@ const loginUser = async (req, res) => {
   }
 };
 
-const getProfile = async (req, res) => {
+const getProfile = (req, res) => {
   const { token } = req.cookies;
-  if(token) {
-      jwt.verify(token, process.env.JWT_SECRET, {}, async (err, user) => {
-        if(err) throw err;
-        res.json(user);
-      })
-  } else {
-      res.status(401).json({ message: "Unauthorized" });
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
-}
+
+  jwt.verify(token, process.env.JWT_SECRET, {}, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    res.json({
+      id: decoded.id,
+      email: decoded.email,
+    });
+  });
+};
 
 const logoutUser = (req, res) => {
-  res.cookie('token', '', {
+  res.clearCookie('token', {
     httpOnly: true,
     secure: false,
     sameSite: 'lax',
-    expires: new Date(0)
-  })
-  .status(200)
-  .json({ message: "Logged out successfully" });
-}
+  });
+
+  res.status(200).json({ message: 'Logged out successfully' });
+};
 
 module.exports = { test, registerUser, loginUser, getProfile, logoutUser };

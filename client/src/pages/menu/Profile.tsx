@@ -3,6 +3,7 @@ import axios from 'axios';
 import { UserContext } from '../../context/userContext';
 import LogoutButton from '../components/LogoutButton';
 import { useNavigate } from 'react-router-dom';
+import '../../css/Profile.css';
 
 type Work = {
   _id: string;
@@ -15,9 +16,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const [works, setWorks] = useState<Work[]>([]);
 
-  if (!context) return <p>Context not available</p>;
+  if (!context) return null;
   const { user } = context;
-  if (!user) return <p>Not logged in</p>;
+  if (!user) return null;
 
   useEffect(() => {
     axios.get('/api/works/my').then(res => setWorks(res.data));
@@ -29,32 +30,34 @@ const Profile = () => {
   };
 
   return (
-    <div>
-      <h1>Profile</h1>
+    <div className="profile-layout">
+      <aside className="profile-card">
+        <h1>Profile</h1>
+        <p><strong>Email</strong><br />{user.email}</p>
+        <LogoutButton />
+      </aside>
 
-      <p><strong>User ID:</strong> {user.id}</p>
-      <p><strong>Email:</strong> {user.email}</p>
+      <section>
+        <h2>My works</h2>
 
-      <h2>My works</h2>
+        <div className="profile-works">
+          {works.map(work => (
+            <div key={work._id} className="work-card">
+              <h3>{work.title}</h3>
+              <p>Status: <strong>{work.status}</strong></p>
 
-      {works.length === 0 && <p>No works yet</p>}
-
-      {works.map(work => (
-        <div key={work._id} style={{ marginBottom: '1rem' }}>
-          <h3>{work.title}</h3>
-          <p>Status: {work.status}</p>
-
-          <button onClick={() => navigate(`/edit/${work._id}`)}>
-            Edit
-          </button>
-
-          <button onClick={() => deleteWork(work._id)}>
-            Delete
-          </button>
+              <div className="work-actions">
+                <button onClick={() => navigate(`/edit/${work._id}`)}>
+                  Edit
+                </button>
+                <button onClick={() => deleteWork(work._id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-
-      <LogoutButton />
+      </section>
     </div>
   );
 };

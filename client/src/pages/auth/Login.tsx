@@ -1,40 +1,48 @@
-import { useState } from 'react'
-import axios from 'axios'
-import { toast } from 'react-hot-toast'
+import { useState, useContext } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
+import { UserContext } from '../../context/userContext';
+import '../../css/Auth.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const context = useContext(UserContext);
+
+  if (!context) {
+    return null;
+  }
+
+  const { setUser } = context;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       await axios.post('/auth/login', {
         email: email.trim().toLowerCase(),
         password: password.trim(),
-      })
+      });
+      const response = await axios.get('/auth/me');
+      setUser(response.data);
 
-      toast.success('Login successful')
-      setEmail('')
-      setPassword('')
-      navigate('/profile')
+      toast.success('Login successful');
+
+      navigate('/profile', { replace: true });
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || 'Login failed'
-      )
+      toast.error(err?.response?.data?.message || 'Login failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="auth-form" onSubmit={handleSubmit}>
       <h2>Login</h2>
 
       <div>
@@ -42,7 +50,7 @@ const Login = () => {
         <input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           required
         />
       </div>
@@ -52,7 +60,7 @@ const Login = () => {
         <input
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           required
         />
       </div>
@@ -60,9 +68,8 @@ const Login = () => {
       <button type="submit" disabled={loading}>
         {loading ? 'Login...' : 'Login'}
       </button>
-      
     </form>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

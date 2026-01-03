@@ -1,0 +1,29 @@
+.profile-header {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+  }
+  
+  .profile-works {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  
+  .work-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .work-card h3 {
+    margin-top: 0;
+  }
+  
+  .work-card button {
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  

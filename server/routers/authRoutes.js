@@ -11,7 +11,7 @@ router.use(cors({
 router.get("/", test)
 router.post("/register", registerUser)
 router.post("/login", loginUser)
-router.get("/profile", getProfile)
+router.get('/me', getProfile);
 router.post("/logout", logoutUser)
 
 module.exports = router;

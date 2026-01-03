@@ -1,4 +1,4 @@
-import './App.css';
+import './css/App.css';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import { UserProvider } from './context/userContext';
