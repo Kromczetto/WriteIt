@@ -4,6 +4,7 @@ import Profile from './pages/menu/Profile';
 import Write from './pages/menu/Write';
 import Store from './pages/menu/Store';
 import Edit from './pages/menu/Edit';
+import Register from './pages/auth/Register';
 import ProtectedRoute from './pages/components/ProtectedRoute';
 import Layout from './layout/Layout';
 
@@ -54,6 +55,12 @@ const AppRouter = () => {
               </ProtectedRoute>
             } 
           />
+        <Route 
+          path="/register" 
+          element={
+          <Register />
+          } 
+        />
 
       </Routes>
     </BrowserRouter>

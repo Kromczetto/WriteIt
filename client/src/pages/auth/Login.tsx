@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { UserContext } from '../../context/userContext';
 import '../../css/Auth.css';
 
@@ -28,11 +28,11 @@ const Login = () => {
         email: email.trim().toLowerCase(),
         password: password.trim(),
       });
+      
       const response = await axios.get('/auth/me');
       setUser(response.data);
 
       toast.success('Login successful');
-
       navigate('/profile', { replace: true });
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Login failed');
@@ -68,6 +68,13 @@ const Login = () => {
       <button type="submit" disabled={loading}>
         {loading ? 'Login...' : 'Login'}
       </button>
+
+      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+        Don’t have an account?{' '}
+        <Link to="/register" style={{ color: '#407bff', fontWeight: 500 }}>
+          Register
+        </Link>
+      </p>
     </form>
   );
 };

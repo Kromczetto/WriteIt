@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useNavigate, Link } from 'react-router-dom';
 import '../../css/Auth.css';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,8 +22,9 @@ const Register = () => {
       });
 
       toast.success('Registration successful');
-      setEmail('');
-      setPassword('');
+
+      // 🔴 AUTOMATYCZNE PRZEJŚCIE DO LOGIN
+      navigate('/login', { replace: true });
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Registration failed');
     } finally {
@@ -55,6 +59,13 @@ const Register = () => {
       <button type="submit" disabled={loading}>
         {loading ? 'Registering...' : 'Register'}
       </button>
+
+      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+        Already have an account?{' '}
+        <Link to="/login" style={{ color: '#407bff', fontWeight: 500 }}>
+          Login
+        </Link>
+      </p>
     </form>
   );
 };
