@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 const Write = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [loading, setLoading] = useState(false);
 
   const saveWork = async () => {
@@ -16,11 +17,13 @@ const Write = () => {
       await axios.post('/api/works', {
         title,
         content,
+        status,
       });
 
-      toast.success('Saved as draft');
+      toast.success('Saved');
       setTitle('');
       setContent('');
+      setStatus('draft');
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Save failed');
     } finally {
@@ -36,14 +39,23 @@ const Write = () => {
         type="text"
         placeholder="Title"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={e => setTitle(e.target.value)}
         style={{ width: '100%', marginBottom: '1rem' }}
       />
+
+      <select
+        value={status}
+        onChange={e => setStatus(e.target.value as any)}
+        style={{ marginBottom: '1rem' }}
+      >
+        <option value="draft">Draft</option>
+        <option value="published">Publish</option>
+      </select>
 
       <ReactQuill value={content} onChange={setContent} />
 
       <button onClick={saveWork} disabled={loading} style={{ marginTop: '1rem' }}>
-        {loading ? 'Saving...' : 'Save draft'}
+        {loading ? 'Saving...' : 'Save'}
       </button>
     </div>
   );

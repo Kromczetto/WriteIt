@@ -3,6 +3,7 @@ import Login from './pages/auth/Login';
 import Profile from './pages/menu/Profile';
 import Write from './pages/menu/Write';
 import Store from './pages/menu/Store';
+import Edit from './pages/menu/Edit';
 import ProtectedRoute from './pages/components/ProtectedRoute';
 import Layout from './layout/Layout';
 
@@ -45,6 +46,14 @@ const AppRouter = () => {
             }
           />
         </Route>
+        <Route 
+          path="/edit/:id" 
+          element={
+              <ProtectedRoute>
+                <Edit />
+              </ProtectedRoute>
+            } 
+          />
 
       </Routes>
     </BrowserRouter>
