@@ -5,14 +5,14 @@ import '../css/MyRentals.css';
 
 type Rental = {
   _id: string;
-  expiresAt?: string;
+  expiresAt: string | null;
   work: {
     _id: string;
     title: string;
   };
 };
 
-const getRemainingTime = (expiresAt?: string) => {
+const getRemaining = (expiresAt: string | null) => {
   if (!expiresAt) return 'Unlimited access';
 
   const diff =
@@ -21,39 +21,50 @@ const getRemainingTime = (expiresAt?: string) => {
   if (diff <= 0) return 'Expired';
 
   const days = Math.ceil(diff / 86400000);
-  return days === 1 ? 'Expires today' : `${days} days left`;
+  return `${days} days left`;
 };
 
 const MyRentals = () => {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const load = () =>
     axios.get('/api/rentals/my').then(res => setRentals(res.data));
+
+  useEffect(() => {
+    load();
   }, []);
+
+  const remove = async (id: string) => {
+    await axios.delete(`/api/rentals/${id}`);
+    load();
+  };
 
   return (
     <div className="rentals-container">
       <h1>My rented articles</h1>
 
       <div className="rentals-grid">
-        {rentals.map(r => {
-          const status = getRemainingTime(r.expiresAt);
-          const expired = status === 'Expired';
-
-          return (
-            <div
-              key={r._id}
-              className={`rental-card ${expired ? 'expired' : ''}`}
-              onClick={() =>
-                !expired && navigate(`/read/${r.work._id}`)
-              }
+        {rentals.map(r => (
+          <div key={r._id} className="rental-card">
+            <h3
+              onClick={() => navigate(`/read/${r.work._id}`)}
             >
-              <h3>{r.work.title}</h3>
-              <span className="rental-badge">{status}</span>
-            </div>
-          );
-        })}
+              {r.work.title}
+            </h3>
+
+            <span className="rental-badge">
+              {getRemaining(r.expiresAt)}
+            </span>
+
+            <button
+              className="delete-btn"
+              onClick={() => remove(r._id)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

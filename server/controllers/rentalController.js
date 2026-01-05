@@ -1,24 +1,50 @@
+const mongoose = require('mongoose');
 const Rental = require('../models/Rental');
 const Work = require('../models/work');
 
 const rentWork = async (req, res) => {
   try {
-    const work = await Work.findById(req.params.workId);
+    const { days } = req.body;
+
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const workId = new mongoose.Types.ObjectId(req.params.workId);
+
+    const work = await Work.findOne({
+      _id: workId,
+      status: 'published'
+    });
+
     if (!work) {
-      return res.status(404).json({ message: 'Work not found' });
+      return res
+        .status(404)
+        .json({ message: 'Article not available' });
+    }
+
+    if (work.author.toString() === userId.toString()) {
+      return res.status(400).json({
+        message: 'You cannot rent your own article'
+      });
+    }
+
+    let expiresAt = null;
+
+    if (days && Number(days) > 0) {
+      expiresAt = new Date(
+        Date.now() + Number(days) * 24 * 60 * 60 * 1000
+      );
     }
 
     const rental = await Rental.create({
-      user: req.user.id,
-      work: work._id,
-      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) 
+      user: userId,
+      work: workId,
+      expiresAt
     });
 
-    res.status(201).json({ message: 'Work rented', rental });
+    res.status(201).json(rental);
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({
-        message: 'You already rented this article'
+        message: 'Article already rented'
       });
     }
 
@@ -28,23 +54,41 @@ const rentWork = async (req, res) => {
 };
 
 const getMyRentals = async (req, res) => {
-  const rentals = await Rental.find({ user: req.user.id })
+  const userId = new mongoose.Types.ObjectId(req.user.id);
+
+  const rentals = await Rental.find({ user: userId })
     .populate('work', 'title')
-    .sort({ rentedAt: -1 });
+    .sort({ createdAt: -1 });
 
   res.json(rentals);
 };
 
+const deleteRental = async (req, res) => {
+  const userId = new mongoose.Types.ObjectId(req.user.id);
+  const rentalId = new mongoose.Types.ObjectId(req.params.id);
+
+  const rental = await Rental.findOneAndDelete({
+    _id: rentalId,
+    user: userId
+  });
+
+  if (!rental) {
+    return res.status(404).json({ message: 'Rental not found' });
+  }
+
+  res.json({ success: true });
+};
+
 const readRentedWork = async (req, res) => {
-  const { workId } = req.params;
+  const userId = new mongoose.Types.ObjectId(req.user.id);
+  const workId = new mongoose.Types.ObjectId(req.params.workId);
 
   const rental = await Rental.findOne({
-    user: req.user.id,
+    user: userId,
     work: workId,
     $or: [
-      { expiresAt: { $exists: false } }, 
-      { expiresAt: null },               
-      { expiresAt: { $gt: new Date() } } 
+      { expiresAt: null },
+      { expiresAt: { $gt: new Date() } }
     ]
   });
 
@@ -61,5 +105,19 @@ const readRentedWork = async (req, res) => {
   res.json(work);
 };
 
+const getMyRentedWorkIds = async (req, res) => {
+  const mongoose = require('mongoose');
+  const userId = new mongoose.Types.ObjectId(req.user.id);
 
-module.exports = { rentWork, getMyRentals, readRentedWork };
+  const rentals = await Rental.find({ user: userId }).select('work');
+
+  res.json(rentals.map(r => r.work.toString()));
+};
+
+module.exports = {
+  rentWork,
+  getMyRentals,
+  deleteRental,
+  readRentedWork,
+  getMyRentedWorkIds
+};
