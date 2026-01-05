@@ -24,7 +24,8 @@ app.use(express.urlencoded({ extended: false}));
 app.use('/auth', require('./routers/authRoutes'));
 app.use('/api', require('./routers/workRoutes'));
 app.use('/api', require('./routers/rentalRoutes'));
-
+app.use('/review', require('./routers/reviewRoutes'));
+app.use('/pdf', require('./routers/pdfRoutes'));
 
 const PORT = process.env.PORT || 8000;
 

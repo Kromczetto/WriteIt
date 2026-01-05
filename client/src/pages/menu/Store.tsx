@@ -18,15 +18,23 @@ type DurationOption = {
   days: number | null;
 };
 
+type RatingInfo = {
+  average: number;
+  count: number;
+};
+
 const DURATION_OPTIONS: DurationOption[] = [
   { label: '1 day', days: 1 },
   { label: '7 days', days: 7 },
   { label: '30 days', days: 30 },
-  { label: 'Unlimited', days: null }
+  { label: 'Unlimited', days: null },
 ];
 
 const Store = () => {
   const [works, setWorks] = useState<Work[]>([]);
+  const [ratings, setRatings] = useState<
+    Record<string, RatingInfo>
+  >({});
   const [query, setQuery] = useState('');
   const [rentedIds, setRentedIds] = useState<string[]>([]);
   const [selectedDuration, setSelectedDuration] =
@@ -46,6 +54,7 @@ const Store = () => {
           .get(`/api/works/search?q=${query}`)
           .then(res => setWorks(res.data));
       }, 300);
+
       return () => clearTimeout(t);
     }
   }, [query]);
@@ -56,12 +65,44 @@ const Store = () => {
       .then(res => setRentedIds(res.data));
   }, []);
 
+  useEffect(() => {
+    if (works.length === 0) return;
+
+    const fetchRatings = async () => {
+      try {
+        const results = await Promise.all(
+          works.map(w =>
+            axios.get(`/review/${w._id}`).then(res => ({
+              workId: w._id,
+              average: res.data.average,
+              count: res.data.count,
+            }))
+          )
+        );
+
+        const map: Record<string, RatingInfo> = {};
+        results.forEach(r => {
+          map[r.workId] = {
+            average: r.average,
+            count: r.count,
+          };
+        });
+
+        setRatings(map);
+      } catch (err) {
+        console.error('Failed to load ratings');
+      }
+    };
+
+    fetchRatings();
+  }, [works]);
+
   const rent = async (workId: string) => {
     try {
       setRentingId(workId);
 
       await axios.post(`/api/rentals/${workId}`, {
-        days: selectedDuration[workId] ?? null
+        days: selectedDuration[workId] ?? null,
       });
 
       setRentedIds(prev => [...prev, workId]);
@@ -80,6 +121,11 @@ const Store = () => {
 
   const preview = (html: string) =>
     html.replace(/<[^>]+>/g, '').slice(0, 160) + '…';
+
+  const renderStars = (avg: number) => {
+    const rounded = Math.round(avg);
+    return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+  };
 
   return (
     <div className="store-container">
@@ -101,9 +147,29 @@ const Store = () => {
           const hasDuration =
             selectedDuration[work._id] !== undefined;
 
+          const rating = ratings[work._id];
+
           return (
             <div key={work._id} className="store-card">
               <h3>{work.title}</h3>
+
+              <div className="store-rating">
+                {rating ? (
+                  <>
+                    <span className="stars">
+                      {renderStars(rating.average)}
+                    </span>
+                    <span className="rating-text">
+                      {rating.average.toFixed(1)} (
+                      {rating.count})
+                    </span>
+                  </>
+                ) : (
+                  <span className="rating-text muted">
+                    No ratings
+                  </span>
+                )}
+              </div>
 
               <p className="store-preview">
                 {preview(work.content)}
@@ -134,7 +200,7 @@ const Store = () => {
                       onClick={() =>
                         setSelectedDuration(prev => ({
                           ...prev,
-                          [work._id]: opt.days
+                          [work._id]: opt.days,
                         }))
                       }
                     >

@@ -30,7 +30,6 @@ const MyRentals = () => {
 
   useEffect(() => {
     axios.get('/api/rentals/my').then(res => {
-      // 🔒 filtrujemy wypożyczenia bez artykułu
       setRentals(res.data.filter((r: Rental) => r.work));
     });
   }, []);

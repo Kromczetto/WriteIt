@@ -93,3 +93,25 @@
   color: #2563eb;
   font-weight: 500;
 }
+
+.store-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.stars {
+  color: #f5b50a;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.rating-text {
+  font-size: 13px;
+  color: #555;
+}
+
+.rating-text.muted {
+  color: #aaa;
+}
