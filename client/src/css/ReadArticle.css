@@ -1,0 +1,20 @@
+.read-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .read-container h1 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .read-content {
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+  
+  .read-error {
+    color: #b91c1c;
+    padding: 2rem;
+  }
+  

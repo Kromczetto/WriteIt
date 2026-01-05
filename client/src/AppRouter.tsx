@@ -8,6 +8,7 @@ import Register from './pages/auth/Register';
 import MyRentals from './pages/MyRentals';
 import ProtectedRoute from './pages/components/ProtectedRoute';
 import Layout from './layout/Layout';
+import ReadArticle from './pages/ReadArticle';
 
 const AppRouter = () => {
   return (
@@ -16,7 +17,6 @@ const AppRouter = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 🔴 WSZYSTKO Z MENU W LAYOUT */}
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/profile" replace />} />
 
@@ -65,6 +65,15 @@ const AppRouter = () => {
             }
           />
         </Route>
+        <Route
+          path="/read/:id"
+          element={
+            <ProtectedRoute>
+              <ReadArticle />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

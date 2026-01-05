@@ -11,7 +11,7 @@ const rentWork = async (req, res) => {
     const rental = await Rental.create({
       user: req.user.id,
       work: work._id,
-      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 dni
+      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) 
     });
 
     res.status(201).json({ message: 'Work rented', rental });
@@ -35,4 +35,31 @@ const getMyRentals = async (req, res) => {
   res.json(rentals);
 };
 
-module.exports = { rentWork, getMyRentals };
+const readRentedWork = async (req, res) => {
+  const { workId } = req.params;
+
+  const rental = await Rental.findOne({
+    user: req.user.id,
+    work: workId,
+    $or: [
+      { expiresAt: { $exists: false } }, 
+      { expiresAt: null },               
+      { expiresAt: { $gt: new Date() } } 
+    ]
+  });
+
+  if (!rental) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  const work = await Work.findById(workId);
+
+  if (!work) {
+    return res.status(404).json({ message: 'Article not found' });
+  }
+
+  res.json(work);
+};
+
+
+module.exports = { rentWork, getMyRentals, readRentedWork };
