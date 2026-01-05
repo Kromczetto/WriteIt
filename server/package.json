@@ -21,6 +21,7 @@
     "mongoose": "^9.0.2",
     "node-html-parser": "^7.0.1",
     "nodemon": "^3.1.11",
-    "pdfkit": "^0.17.2"
+    "pdfkit": "^0.17.2",
+    "puppeteer": "^24.34.0"
   }
 }
