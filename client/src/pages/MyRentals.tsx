@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../css/MyRentals.css';
 
 type Rental = {
@@ -25,13 +26,18 @@ const getRemaining = (expiresAt: string | null) => {
 
 const MyRentals = () => {
   const [rentals, setRentals] = useState<Rental[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('/api/rentals/my').then(res => {
-      // 🔴 filtrujemy uszkodzone wypożyczenia
+      // 🔒 filtrujemy wypożyczenia bez artykułu
       setRentals(res.data.filter((r: Rental) => r.work));
     });
   }, []);
+
+  const readArticle = (workId: string) => {
+    navigate(`/read/${workId}`);
+  };
 
   return (
     <div className="rentals-container">
@@ -41,15 +47,26 @@ const MyRentals = () => {
         <p>No active rentals</p>
       )}
 
-      {rentals.map(rental => (
-        <div key={rental._id} className="rental-card">
-          <h3>{rental.work!.title}</h3>
+      <div className="rentals-grid">
+        {rentals.map(rental => (
+          <div key={rental._id} className="rental-card">
+            <h3>{rental.work!.title}</h3>
 
-          <span className="rental-badge">
-            {getRemaining(rental.expiresAt)}
-          </span>
-        </div>
-      ))}
+            <span className="rental-badge">
+              {getRemaining(rental.expiresAt)}
+            </span>
+
+            <button
+              className="read-btn"
+              onClick={() =>
+                readArticle(rental.work!._id)
+              }
+            >
+              Read article
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
