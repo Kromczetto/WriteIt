@@ -27,23 +27,30 @@ const DURATION_OPTIONS: DurationOption[] = [
 
 const Store = () => {
   const [works, setWorks] = useState<Work[]>([]);
+  const [query, setQuery] = useState('');
   const [rentedIds, setRentedIds] = useState<string[]>([]);
   const [selectedDuration, setSelectedDuration] =
     useState<Record<string, number | null>>({});
   const [rentingId, setRentingId] = useState<string | null>(null);
 
   const context = useContext(UserContext);
-
-  // 🔒 zabezpieczenie – user jeszcze się ładuje
-  if (!context || !context.user) {
-    return null;
-  }
-
+  if (!context || !context.user) return null;
   const { user } = context;
 
   useEffect(() => {
-    axios.get('/api/works').then(res => setWorks(res.data));
+    if (query.trim().length < 2) {
+      axios.get('/api/works').then(res => setWorks(res.data));
+    } else {
+      const t = setTimeout(() => {
+        axios
+          .get(`/api/works/search?q=${query}`)
+          .then(res => setWorks(res.data));
+      }, 300);
+      return () => clearTimeout(t);
+    }
+  }, [query]);
 
+  useEffect(() => {
     axios
       .get('/api/rentals/my/work-ids')
       .then(res => setRentedIds(res.data));
@@ -57,37 +64,41 @@ const Store = () => {
         days: selectedDuration[workId] ?? null
       });
 
-      // ✅ oznacz jako wypożyczony
       setRentedIds(prev => [...prev, workId]);
 
-      // ✅ zresetuj wybór czasu dla tego artykułu
       setSelectedDuration(prev => {
         const copy = { ...prev };
         delete copy[workId];
         return copy;
       });
     } catch (err: any) {
-      alert(
-        err?.response?.data?.message ||
-          'Could not rent article'
-      );
+      alert(err?.response?.data?.message || 'Rent failed');
     } finally {
       setRentingId(null);
     }
   };
 
-  const getPreview = (html: string) =>
+  const preview = (html: string) =>
     html.replace(/<[^>]+>/g, '').slice(0, 160) + '…';
 
   return (
     <div className="store-container">
-      <h1>Store</h1>
+      <div className="store-header">
+        <h1>Store</h1>
+
+        <input
+          className="search-input"
+          placeholder="Search articles..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
+      </div>
 
       <div className="store-grid">
         {works.map(work => {
-          const isRented = rentedIds.includes(work._id);
           const isOwn = work.author._id === user.id;
-          const hasSelectedDuration =
+          const isRented = rentedIds.includes(work._id);
+          const hasDuration =
             selectedDuration[work._id] !== undefined;
 
           return (
@@ -95,10 +106,9 @@ const Store = () => {
               <h3>{work.title}</h3>
 
               <p className="store-preview">
-                {getPreview(work.content)}
+                {preview(work.content)}
               </p>
 
-              {/* INFO */}
               {isOwn && (
                 <p className="store-info">
                   This is your article
@@ -107,12 +117,11 @@ const Store = () => {
 
               {isRented && !isOwn && (
                 <p className="store-info rented">
-                  You already rented this article
+                  Already in your library
                 </p>
               )}
 
-              {/* WYBÓR CZASU */}
-              {!isRented && !isOwn && (
+              {!isOwn && !isRented && (
                 <div className="duration-options">
                   {DURATION_OPTIONS.map(opt => (
                     <button
@@ -135,7 +144,6 @@ const Store = () => {
                 </div>
               )}
 
-              {/* CTA */}
               {isRented ? (
                 <a
                   href={`/read/${work._id}`}
@@ -148,7 +156,7 @@ const Store = () => {
                   className="rent-btn"
                   disabled={
                     isOwn ||
-                    !hasSelectedDuration ||
+                    !hasDuration ||
                     rentingId === work._id
                   }
                   onClick={() => rent(work._id)}

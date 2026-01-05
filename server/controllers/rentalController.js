@@ -15,9 +15,9 @@ const rentWork = async (req, res) => {
     });
 
     if (!work) {
-      return res
-        .status(404)
-        .json({ message: 'Article not available' });
+      return res.status(404).json({
+        message: 'Article not available'
+      });
     }
 
     if (work.author.toString() === userId.toString()) {
@@ -27,10 +27,9 @@ const rentWork = async (req, res) => {
     }
 
     let expiresAt = null;
-
     if (days && Number(days) > 0) {
       expiresAt = new Date(
-        Date.now() + Number(days) * 24 * 60 * 60 * 1000
+        Date.now() + Number(days) * 86400000
       );
     }
 
@@ -43,12 +42,12 @@ const rentWork = async (req, res) => {
     res.status(201).json(rental);
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({
-        message: 'Article already rented'
-      });
+      return res
+        .status(400)
+        .json({ message: 'Article already rented' });
     }
 
-    console.error('RENT WORK ERROR:', error);
+    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -73,7 +72,9 @@ const deleteRental = async (req, res) => {
   });
 
   if (!rental) {
-    return res.status(404).json({ message: 'Rental not found' });
+    return res.status(404).json({
+      message: 'Rental not found'
+    });
   }
 
   res.json({ success: true });
@@ -93,25 +94,49 @@ const readRentedWork = async (req, res) => {
   });
 
   if (!rental) {
-    return res.status(403).json({ message: 'Access denied' });
+    return res.status(403).json({
+      message: 'Access denied'
+    });
   }
 
   const work = await Work.findById(workId);
-
-  if (!work) {
-    return res.status(404).json({ message: 'Article not found' });
-  }
-
   res.json(work);
 };
 
 const getMyRentedWorkIds = async (req, res) => {
-  const mongoose = require('mongoose');
   const userId = new mongoose.Types.ObjectId(req.user.id);
 
-  const rentals = await Rental.find({ user: userId }).select('work');
+  const rentals = await Rental.find({ user: userId }).select(
+    'work'
+  );
 
   res.json(rentals.map(r => r.work.toString()));
+};
+
+const getTopRented = async (req, res) => {
+  const top = await Rental.aggregate([
+    { $group: { _id: '$work', count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        from: 'works',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'work'
+      }
+    },
+    { $unwind: '$work' },
+    {
+      $project: {
+        _id: '$work._id',
+        title: '$work.title',
+        count: 1
+      }
+    }
+  ]);
+
+  res.json(top);
 };
 
 module.exports = {
@@ -119,5 +144,6 @@ module.exports = {
   getMyRentals,
   deleteRental,
   readRentedWork,
-  getMyRentedWorkIds
+  getMyRentedWorkIds,
+  getTopRented
 };

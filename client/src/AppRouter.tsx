@@ -1,14 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+
 import Profile from './pages/menu/Profile';
 import Write from './pages/menu/Write';
 import Store from './pages/menu/Store';
 import Edit from './pages/menu/Edit';
-import Register from './pages/auth/Register';
+import TopRented from './pages/menu/TopRented';
+
 import MyRentals from './pages/MyRentals';
+import ReadArticle from './pages/ReadArticle';
+
 import ProtectedRoute from './pages/components/ProtectedRoute';
 import Layout from './layout/Layout';
-import ReadArticle from './pages/ReadArticle';
 
 const AppRouter = () => {
   return (
@@ -18,13 +23,22 @@ const AppRouter = () => {
         <Route path="/register" element={<Register />} />
 
         <Route element={<Layout />}>
-          <Route path="/" element={<Navigate to="/profile" replace />} />
+          <Route path="/" element={<Navigate to="/store" replace />} />
 
           <Route
-            path="/profile"
+            path="/store"
             element={
               <ProtectedRoute>
-                <Profile />
+                <Store />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/top"
+            element={
+              <ProtectedRoute>
+                <TopRented />
               </ProtectedRoute>
             }
           />
@@ -39,10 +53,10 @@ const AppRouter = () => {
           />
 
           <Route
-            path="/store"
+            path="/profile"
             element={
               <ProtectedRoute>
-                <Store />
+                <Profile />
               </ProtectedRoute>
             }
           />
@@ -64,16 +78,16 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
-        </Route>
-        <Route
-          path="/read/:id"
-          element={
-            <ProtectedRoute>
-              <ReadArticle />
-            </ProtectedRoute>
-          }
-        />
 
+          <Route
+            path="/read/:id"
+            element={
+              <ProtectedRoute>
+                <ReadArticle />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
