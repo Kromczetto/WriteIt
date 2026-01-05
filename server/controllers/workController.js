@@ -1,8 +1,9 @@
 const Work = require('../models/work');
+const Rental = require('../models/Rental');
 
 const createWork = async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, status } = req.body;
 
     if (!title || !content) {
       return res
@@ -13,6 +14,7 @@ const createWork = async (req, res) => {
     const work = await Work.create({
       title,
       content,
+      status: status === 'published' ? 'published' : 'draft',
       author: req.user.id
     });
 
@@ -72,7 +74,6 @@ const getWorkById = async (req, res) => {
   res.json(work);
 };
 
-// UPDATE
 const updateWork = async (req, res) => {
   const work = await Work.findById(req.params.id);
 
@@ -104,11 +105,11 @@ const deleteWork = async (req, res) => {
   if (work.author.toString() !== req.user.id) {
     return res.status(403).json({ message: 'Access denied' });
   }
+  await Rental.deleteMany({ work: work._id });
 
   await work.deleteOne();
   res.json({ success: true });
 };
-
 module.exports = {
   createWork,
   getWorks,
