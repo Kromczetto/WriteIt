@@ -38,6 +38,10 @@ const Profile = () => {
       </aside>
 
       <section>
+      <button onClick={() => navigate('/my-rentals')}>
+        My rentals
+      </button>
+
         <h2>My works</h2>
 
         <div className="profile-works">

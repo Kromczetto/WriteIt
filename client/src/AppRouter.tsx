@@ -5,6 +5,7 @@ import Write from './pages/menu/Write';
 import Store from './pages/menu/Store';
 import Edit from './pages/menu/Edit';
 import Register from './pages/auth/Register';
+import MyRentals from './pages/MyRentals';
 import ProtectedRoute from './pages/components/ProtectedRoute';
 import Layout from './layout/Layout';
 
@@ -13,11 +14,19 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
+        {/* 🔴 WSZYSTKO Z MENU W LAYOUT */}
         <Route element={<Layout />}>
+          <Route path="/" element={<Navigate to="/profile" replace />} />
+
           <Route
-            path="/"
-            element={<Navigate to="/profile" replace />}
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
           />
 
           <Route
@@ -39,29 +48,23 @@ const AppRouter = () => {
           />
 
           <Route
-            path="/profile"
+            path="/my-rentals"
             element={
               <ProtectedRoute>
-                <Profile />
+                <MyRentals />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Edit />
               </ProtectedRoute>
             }
           />
         </Route>
-        <Route 
-          path="/edit/:id" 
-          element={
-              <ProtectedRoute>
-                <Edit />
-              </ProtectedRoute>
-            } 
-          />
-        <Route 
-          path="/register" 
-          element={
-          <Register />
-          } 
-        />
-
       </Routes>
     </BrowserRouter>
   );
