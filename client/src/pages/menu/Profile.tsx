@@ -16,9 +16,8 @@ const Profile = () => {
   const navigate = useNavigate();
   const [works, setWorks] = useState<Work[]>([]);
 
-  if (!context) return null;
+  if (!context || !context.user) return null;
   const { user } = context;
-  if (!user) return null;
 
   useEffect(() => {
     axios.get('/api/works/my').then(res => setWorks(res.data));
@@ -32,29 +31,76 @@ const Profile = () => {
   return (
     <div className="profile-layout">
       <aside className="profile-card">
-        <h1>Profile</h1>
-        <p><strong>Email</strong><br />{user.email}</p>
-        <LogoutButton />
+        <div className="profile-header">
+          <h1>Profile</h1>
+          <p className="profile-email">{user.email}</p>
+        </div>
+
+        <nav className="profile-nav">
+          <button
+            className="nav-btn"
+            onClick={() => navigate('/my-rentals')}
+          >
+            My rentals
+          </button>
+
+          <button
+            className="nav-btn secondary"
+            onClick={() => navigate('/store')}
+          >
+            Store
+          </button>
+        </nav>
+
+        <div className="profile-footer">
+          <LogoutButton />
+        </div>
       </aside>
 
-      <section>
-      <button onClick={() => navigate('/my-rentals')}>
-        My rentals
-      </button>
-
-        <h2>My works</h2>
+      <section className="profile-content">
+        <div className="content-header">
+          <h2>My works</h2>
+          <button
+            className="primary-btn"
+            onClick={() => navigate('/write')}
+          >
+            + New article
+          </button>
+        </div>
 
         <div className="profile-works">
+          {works.length === 0 && (
+            <p className="empty-text">
+              You haven’t created any articles yet.
+            </p>
+          )}
+
           {works.map(work => (
             <div key={work._id} className="work-card">
-              <h3>{work.title}</h3>
-              <p>Status: <strong>{work.status}</strong></p>
+              <div>
+                <h3>{work.title}</h3>
+                <span
+                  className={`status ${
+                    work.status === 'published'
+                      ? 'published'
+                      : 'draft'
+                  }`}
+                >
+                  {work.status}
+                </span>
+              </div>
 
               <div className="work-actions">
-                <button onClick={() => navigate(`/edit/${work._id}`)}>
+                <button
+                  className="link-btn"
+                  onClick={() => navigate(`/edit/${work._id}`)}
+                >
                   Edit
                 </button>
-                <button onClick={() => deleteWork(work._id)}>
+                <button
+                  className="link-btn danger"
+                  onClick={() => deleteWork(work._id)}
+                >
                   Delete
                 </button>
               </div>

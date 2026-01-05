@@ -1,29 +1,132 @@
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: calc(100vh - 60px);
+}
+
+/* SIDEBAR */
+.profile-card {
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
 .profile-header {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    margin-bottom: 2rem;
-  }
-  
-  .profile-works {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1rem;
-  }
-  
-  .work-card {
-    background: white;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  }
-  
-  .work-card h3 {
-    margin-top: 0;
-  }
-  
-  .work-card button {
-    margin-right: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  
+  margin-bottom: 2rem;
+}
+
+.profile-email {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.profile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.nav-btn.secondary {
+  background: #eef2ff;
+}
+
+.nav-btn:hover {
+  background: #e5e7eb;
+}
+
+.profile-footer {
+  margin-top: auto;
+}
+
+/* CONTENT */
+.profile-content {
+  padding: 2.5rem;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.primary-btn {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #1e40af;
+}
+
+.profile-works {
+  display: grid;
+  gap: 1rem;
+}
+
+.work-card {
+  background: #ffffff;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.status.published {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.work-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.link-btn.danger {
+  color: #b91c1c;
+}
+
+.empty-text {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
