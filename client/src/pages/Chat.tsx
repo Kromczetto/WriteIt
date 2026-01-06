@@ -1,72 +1,106 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { io, Socket } from 'socket.io-client';
+import '../css/Chat.css';
 
 type Message = {
   _id: string;
-  text?: string;
+  text: string;
   from: string;
-  work?: {
-    _id: string;
-    title: string;
-  };
 };
 
 const Chat = () => {
   const { friendId } = useParams<{ friendId: string }>();
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState('');
+  const [myId, setMyId] = useState<string | null>(null);
+
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    axios.get(`/api/chat/${friendId}`).then(res =>
-      setMessages(res.data)
-    );
-  }, [friendId]);
+    axios
+      .get('/auth/me', { withCredentials: true })
+      .then(res => setMyId(res.data.id));
+  }, []);
+
+  useEffect(() => {
+    if (!friendId || !myId) return;
+
+    const room = [myId, friendId].sort().join('_');
+
+    socketRef.current = io('http://localhost:8000', {
+      withCredentials: true,
+    });
+
+    socketRef.current.emit('join', room);
+
+    socketRef.current.on('new-message', (msg: Message) => {
+      setMessages(prev => {
+        if (prev.some(m => m._id === msg._id)) return prev;
+        return [...prev, msg];
+      });
+    });
+
+    axios
+      .get(`/api/chat/${friendId}`, {
+        withCredentials: true,
+      })
+      .then(res => setMessages(res.data));
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, [friendId, myId]);
 
   const send = async () => {
-    if (!text.trim()) return;
+    if (!friendId || !myId || !text.trim()) return;
+
+    const room = [myId, friendId].sort().join('_');
 
     const res = await axios.post(
       `/api/chat/${friendId}`,
-      { text }
+      { text },
+      { withCredentials: true }
     );
 
-    setMessages(prev => [...prev, res.data]);
+    socketRef.current?.emit('send-message', {
+      ...res.data,
+      room,
+    });
+
     setText('');
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Chat</h1>
+    <div className="chat-container">
+      <h1 className="chat-title">Chat</h1>
 
-      <div
-        style={{
-          border: '1px solid #ccc',
-          padding: 10,
-          height: 300,
-          overflowY: 'auto',
-          marginBottom: 10,
-        }}
-      >
+      <div className="chat-messages">
         {messages.map(m => (
-          <div key={m._id}>
-            <p>{m.text}</p>
-
-            {m.work && (
-              <a href={`/read/${m.work._id}`}>
-                📘 {m.work.title}
-              </a>
-            )}
+          <div
+            key={m._id}
+            className={`chat-message ${
+              m.from === myId ? 'my-message' : 'their-message'
+            }`}
+          >
+            {m.text}
           </div>
         ))}
       </div>
 
-      <input
-        value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder="Type message"
-      />
-      <button onClick={send}>Send</button>
+      <div className="chat-input-row">
+        <input
+          className="chat-input"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Type message"
+        />
+        <button className="chat-send-btn" onClick={send}>
+          Send
+        </button>
+      </div>
     </div>
   );
 };

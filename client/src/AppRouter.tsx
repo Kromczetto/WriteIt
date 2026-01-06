@@ -99,15 +99,15 @@ const AppRouter = () => {
             }
           />
 
+          {/* ✅ JEDYNY CHAT ROUTE */}
           <Route
-            path="/chat/:id"
+            path="/chat/:friendId"
             element={
               <ProtectedRoute>
                 <Chat />
               </ProtectedRoute>
             }
           />
-
         </Route>
       </Routes>
     </BrowserRouter>
