@@ -115,3 +115,63 @@
 .rating-text.muted {
   color: #aaa;
 }
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.popup {
+  background: #ffffff;
+  padding: 22px 20px;
+  border-radius: 12px;
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.popup h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.friend-option {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.friend-option:hover {
+  background: #e5e7eb;
+}
+
+.popup-cancel {
+  margin-top: 6px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 13px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.popup-cancel:hover {
+  color: #111827;
+}

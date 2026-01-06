@@ -1,23 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import '../css/Chat.css';
 
 type Message = {
   _id: string;
-  text: string;
+  text?: string;
   from: string;
+  work?: {
+    _id: string;
+    title: string;
+  };
 };
 
 const Chat = () => {
   const { friendId } = useParams<{ friendId: string }>();
+  const navigate = useNavigate();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState('');
   const [myId, setMyId] = useState<string | null>(null);
 
   const socketRef = useRef<Socket | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     axios
@@ -44,9 +50,7 @@ const Chat = () => {
     });
 
     axios
-      .get(`/api/chat/${friendId}`, {
-        withCredentials: true,
-      })
+      .get(`/api/chat/${friendId}`, { withCredentials: true })
       .then(res => setMessages(res.data));
 
     return () => {
@@ -54,7 +58,11 @@ const Chat = () => {
     };
   }, [friendId, myId]);
 
-  const send = async () => {
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendText = async () => {
     if (!friendId || !myId || !text.trim()) return;
 
     const room = [myId, friendId].sort().join('_');
@@ -73,6 +81,23 @@ const Chat = () => {
     setText('');
   };
 
+  const sendArticle = async (workId: string) => {
+    if (!friendId || !myId) return;
+
+    const room = [myId, friendId].sort().join('_');
+
+    const res = await axios.post(
+      `/api/chat/${friendId}`,
+      { workId },
+      { withCredentials: true }
+    );
+
+    socketRef.current?.emit('send-message', {
+      ...res.data,
+      room,
+    });
+  };
+
   return (
     <div className="chat-container">
       <h1 className="chat-title">Chat</h1>
@@ -85,9 +110,20 @@ const Chat = () => {
               m.from === myId ? 'my-message' : 'their-message'
             }`}
           >
-            {m.text}
+            {m.text && <p>{m.text}</p>}
+
+            {m.work && (
+              <div
+                className="chat-article"
+                onClick={() => navigate(`/read/${m.work!._id}`)}
+              >
+                📘 {m.work.title}
+              </div>
+            )}
           </div>
         ))}
+
+        <div ref={bottomRef} />
       </div>
 
       <div className="chat-input-row">
@@ -97,8 +133,20 @@ const Chat = () => {
           onChange={e => setText(e.target.value)}
           placeholder="Type message"
         />
-        <button className="chat-send-btn" onClick={send}>
+
+        <button className="chat-send-btn" onClick={sendText}>
           Send
+        </button>
+
+        {/* DEMO – wysyłanie artykułu */}
+        <button
+          className="chat-article-btn"
+          onClick={() => {
+            const id = prompt('Work ID');
+            if (id) sendArticle(id);
+          }}
+        >
+          Send article
         </button>
       </div>
     </div>
