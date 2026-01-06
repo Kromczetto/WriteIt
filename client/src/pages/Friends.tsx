@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../css/Friends.css';
 
 type Friend = {
   _id: string;
@@ -53,12 +54,6 @@ const Friends = () => {
         { withCredentials: true }
       );
       setSearchEmail('');
-      alert('Friend request sent');
-    } catch (err: any) {
-      alert(
-        err?.response?.data?.message ||
-          'Failed to send request'
-      );
     } finally {
       setLoading(false);
     }
@@ -75,66 +70,72 @@ const Friends = () => {
   };
 
   return (
-    <div style={{ padding: 20, maxWidth: 600 }}>
-      <h1>Friends</h1>
+    <div className="friends-container">
+      <h1 className="friends-title">Friends</h1>
 
-      {/* 🔍 SEARCH */}
-      <div style={{ marginBottom: 20 }}>
+      {/* ADD FRIEND */}
+      <div className="section">
         <h3>Add friend</h3>
-        <input
-          placeholder="User email"
-          value={searchEmail}
-          onChange={e => setSearchEmail(e.target.value)}
-          style={{ marginRight: 10 }}
-        />
-        <button
-          onClick={sendRequest}
-          disabled={loading}
-        >
-          Send request
-        </button>
+        <div className="add-friend">
+          <input
+            placeholder="User email"
+            value={searchEmail}
+            onChange={e => setSearchEmail(e.target.value)}
+          />
+          <button onClick={sendRequest} disabled={loading}>
+            Send
+          </button>
+        </div>
       </div>
 
-      {/* 📥 REQUESTS */}
+      {/* REQUESTS */}
       {requests.length > 0 && (
-        <div style={{ marginBottom: 30 }}>
+        <div className="section">
           <h3>Friend requests</h3>
-          <ul>
+          <ul className="list">
             {requests.map(r => (
-              <li key={r._id}>
-                {r.from.email}{' '}
-                <button
-                  onClick={() => acceptRequest(r._id)}
-                >
-                  Accept
-                </button>
+              <li key={r._id} className="list-item">
+                <span>{r.from.email}</span>
+                <div className="list-actions">
+                  <button
+                    className="accept-btn"
+                    onClick={() => acceptRequest(r._id)}
+                  >
+                    Accept
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* 👥 FRIENDS */}
-      <h3>Your friends</h3>
+      {/* FRIENDS */}
+      <div className="section">
+        <h3>Your friends</h3>
 
-      {friends.length === 0 && (
-        <p>No friends yet</p>
-      )}
+        {friends.length === 0 && (
+          <p className="empty">No friends yet</p>
+        )}
 
-      <ul>
-        {friends.map(friend => (
-          <li key={friend._id}>
-            {friend.email}{' '}
-            <button
-              onClick={() =>
-                navigate(`/chat/${friend._id}`)
-              }
-            >
-              Open chat
-            </button>
-          </li>
-        ))}
-      </ul>
+        <ul className="list">
+          {friends.map(friend => (
+            <li key={friend._id} className="list-item">
+              <span>{friend.email}</span>
+              <div className="list-actions">
+                <button
+                  className="chat-btn"
+                  onClick={() =>
+                    navigate(`/chat/${friend._id}`)
+                  }
+                >
+                  Open chat
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

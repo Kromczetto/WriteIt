@@ -81,23 +81,6 @@ const Chat = () => {
     setText('');
   };
 
-  const sendArticle = async (workId: string) => {
-    if (!friendId || !myId) return;
-
-    const room = [myId, friendId].sort().join('_');
-
-    const res = await axios.post(
-      `/api/chat/${friendId}`,
-      { workId },
-      { withCredentials: true }
-    );
-
-    socketRef.current?.emit('send-message', {
-      ...res.data,
-      room,
-    });
-  };
-
   return (
     <div className="chat-container">
       <h1 className="chat-title">Chat</h1>
@@ -136,17 +119,6 @@ const Chat = () => {
 
         <button className="chat-send-btn" onClick={sendText}>
           Send
-        </button>
-
-        {/* DEMO – wysyłanie artykułu */}
-        <button
-          className="chat-article-btn"
-          onClick={() => {
-            const id = prompt('Work ID');
-            if (id) sendArticle(id);
-          }}
-        >
-          Send article
         </button>
       </div>
     </div>

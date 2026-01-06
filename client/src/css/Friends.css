@@ -1,0 +1,101 @@
+.friends-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
+  }
+  
+  .friends-title {
+    margin-bottom: 20px;
+  }
+  
+  .section {
+    margin-bottom: 30px;
+  }
+  
+  .section h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  
+  .add-friend {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .add-friend input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .add-friend button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background-color: #407bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .add-friend button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f9f9f9;
+    margin-bottom: 8px;
+  }
+  
+  .list-item span {
+    font-size: 14px;
+  }
+  
+  .list-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .accept-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #16a34a;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .chat-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #6b7280;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .accept-btn:hover {
+    background-color: #15803d;
+  }
+  
+  .chat-btn:hover {
+    background-color: #4b5563;
+  }
+  
+  .empty {
+    font-size: 14px;
+    color: #6b7280;
+  }
+  

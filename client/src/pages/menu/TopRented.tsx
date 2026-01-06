@@ -26,7 +26,6 @@ const TopRented = () => {
           <div
             key={w._id}
             className="top-card"
-            onClick={() => navigate(`/read/${w._id}`)}
           >
             <div className="rank">#{i + 1}</div>
             <div>

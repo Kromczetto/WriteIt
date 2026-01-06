@@ -45,10 +45,17 @@ const Profile = () => {
           </button>
 
           <button
-            className="nav-btn secondary"
+            className="nav-btn"
             onClick={() => navigate('/store')}
           >
             Store
+          </button>
+
+          <button
+            className="nav-btn"
+            onClick={() => navigate('/friends')}
+          >
+            Friends
           </button>
         </nav>
 
