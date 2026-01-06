@@ -18,3 +18,43 @@
     padding: 2rem;
   }
   
+  .article-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+  }
+  
+  .article-content {
+    line-height: 1.6;
+  }
+  
+  .paywall {
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 30px;
+    border: 1px solid #ddd;
+    text-align: center;
+    border-radius: 10px;
+  }
+  
+  .paywall-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .paywall-actions button {
+    padding: 8px 14px;
+    border: none;
+    background: #407bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  
+  .paywall-actions button:hover {
+    background: #3065e0;
+  }
+  

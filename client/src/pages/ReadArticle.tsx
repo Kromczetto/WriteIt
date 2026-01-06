@@ -1,97 +1,120 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import Rating from './components/Rating';
-import { useReview } from '../hooks/useReview';
 import '../css/ReadArticle.css';
 
 type Work = {
+  _id: string;
   title: string;
   content: string;
 };
 
 const ReadArticle = () => {
   const { id } = useParams<{ id: string }>();
+
   const [work, setWork] = useState<Work | null>(null);
-  const [error, setError] = useState('');
+  const [locked, setLocked] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [renting, setRenting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!id) return null;
-
-  const {
-    average,
-    count,
-    myRating,
-    rate,
-    loading: ratingLoading,
-  } = useReview(id);
-
-  useEffect(() => {
-    axios
-      .get(`/api/rentals/read/${id}`, {
-        withCredentials: true,
-      })
-      .then(res => setWork(res.data))
-      .catch(() => setError('Access denied'));
-  }, [id]);
-
-  const downloadPdf = async () => {
+  const loadArticle = async () => {
     try {
       const res = await axios.get(
-        `/pdf/rentals/pdf/${id}`,
-        {
-          responseType: 'blob',
-          withCredentials: true,
-        }
+        `/api/rentals/read/${id}`,
+        { withCredentials: true }
       );
 
-      const blob = new Blob([res.data], {
-        type: 'application/pdf',
-      });
-
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${work?.title || 'article'}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      alert('PDF download failed');
+      setWork(res.data);
+      setLocked(false);
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        setLocked(true);
+      } else {
+        setError('Failed to load article');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (error) {
-    return <p className="read-error">{error}</p>;
+  useEffect(() => {
+    loadArticle();
+  }, [id]);
+
+  const rent = async (days: number | null) => {
+    try {
+      setRenting(true);
+      setError(null);
+
+      await axios.post(
+        `/api/rentals/${id}`,
+        { days },
+        { withCredentials: true }
+      );
+
+      await loadArticle();
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          'Rent failed'
+      );
+    } finally {
+      setRenting(false);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;
   }
 
-  if (!work) return <p>Loading...</p>;
+  if (locked) {
+    return (
+      <div className="paywall">
+        <h2>This article is locked</h2>
+        <p>You need to rent it to continue reading.</p>
+
+        {error && (
+          <p className="paywall-error">{error}</p>
+        )}
+
+        <div className="paywall-actions">
+          <button
+            disabled={renting}
+            onClick={() => rent(1)}
+          >
+            Rent 1 day
+          </button>
+          <button
+            disabled={renting}
+            onClick={() => rent(7)}
+          >
+            Rent 7 days
+          </button>
+          <button
+            disabled={renting}
+            onClick={() => rent(30)}
+          >
+            Rent 30 days
+          </button>
+          <button
+            disabled={renting}
+            onClick={() => rent(null)}
+          >
+            Unlimited
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!work) return null;
 
   return (
-    <div className="read-container">
+    <div className="article-container">
       <h1>{work.title}</h1>
-
-      <div className="rating-section">
-        <p>
-          Rating:{' '}
-          {average !== null
-            ? `${average} / 5 (${count} votes)`
-            : 'No ratings yet'}
-        </p>
-
-        {!ratingLoading && (
-          <Rating value={myRating} onChange={rate} />
-        )}
-      </div>
-
-      <button className="pdf-btn" onClick={downloadPdf}>
-        Download PDF
-      </button>
-
       <div
-        className="read-content"
+        className="article-content"
         dangerouslySetInnerHTML={{
           __html: work.content,
         }}
