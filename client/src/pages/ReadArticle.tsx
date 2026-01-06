@@ -25,6 +25,7 @@ const ReadArticle = () => {
   const [loading, setLoading] = useState(true);
   const [renting, setRenting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const loadArticle = async () => {
     try {
@@ -82,6 +83,43 @@ const ReadArticle = () => {
     }
   };
 
+  // 📄 PDF DOWNLOAD
+  const downloadPdf = async () => {
+    if (!id) return;
+
+    try {
+      setPdfLoading(true);
+      setError(null);
+
+      const res = await axios.get(
+        `/pdf/rentals/pdf/${id}`,
+        {
+          responseType: 'blob',
+          withCredentials: true,
+        }
+      );
+
+      const blob = new Blob([res.data], {
+        type: 'application/pdf',
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${work?.title || 'article'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError('PDF download failed');
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
 
   if (locked) {
@@ -133,6 +171,15 @@ const ReadArticle = () => {
           />
         </div>
       )}
+
+      {/* 📄 PDF */}
+      <button
+        className="pdf-btn"
+        onClick={downloadPdf}
+        disabled={pdfLoading}
+      >
+        {pdfLoading ? 'Generating PDF...' : 'Download PDF'}
+      </button>
 
       <div
         className="article-content"

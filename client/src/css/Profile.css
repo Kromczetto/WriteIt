@@ -130,3 +130,36 @@
   color: #6b7280;
   font-size: 0.9rem;
 }
+
+/* LINK BUTTONS (Edit / Delete) */
+
+.link-btn {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
+  transition: background-color 0.15s ease,
+              color 0.15s ease;
+}
+
+.link-btn:hover {
+  background: #eef2ff;
+  color: #1e40af;
+}
+
+.link-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.link-btn.danger {
+  color: #b91c1c;
+}
+
+.link-btn.danger:hover {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
