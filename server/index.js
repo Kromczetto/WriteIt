@@ -26,6 +26,8 @@ app.use('/api', require('./routers/workRoutes'));
 app.use('/api', require('./routers/rentalRoutes'));
 app.use('/review', require('./routers/reviewRoutes'));
 app.use('/pdf', require('./routers/pdfRoutes'));
+app.use('/api/chat', require('./routers/chat'));
+app.use('/api/friends', require('./routers/friends'));
 
 const PORT = process.env.PORT || 8000;
 

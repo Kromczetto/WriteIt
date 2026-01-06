@@ -8,6 +8,8 @@ import Write from './pages/menu/Write';
 import Store from './pages/menu/Store';
 import Edit from './pages/menu/Edit';
 import TopRented from './pages/menu/TopRented';
+import Chat from './pages/Chat';
+import Friends from './pages/Friends';
 
 import MyRentals from './pages/MyRentals';
 import ReadArticle from './pages/ReadArticle';
@@ -87,6 +89,25 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <Friends />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/chat/:id"
+            element={
+              <ProtectedRoute>
+                <Chat />
+              </ProtectedRoute>
+            }
+          />
+
         </Route>
       </Routes>
     </BrowserRouter>
