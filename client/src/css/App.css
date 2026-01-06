@@ -36,7 +36,6 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* INPUTS */
 input,
 select {
   width: 100%;

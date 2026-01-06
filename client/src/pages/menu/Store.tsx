@@ -52,7 +52,6 @@ const Store = () => {
   if (!context || !context.user) return null;
   const { user } = context;
 
-  /* ===== LOAD DATA ===== */
   useEffect(() => {
     axios.get('/api/works').then(res => setWorks(res.data));
     axios
@@ -63,7 +62,6 @@ const Store = () => {
       .then(res => setFriends(res.data));
   }, []);
 
-  /* ===== SEARCH ===== */
   useEffect(() => {
     if (query.trim().length < 2) return;
 
@@ -76,7 +74,6 @@ const Store = () => {
     return () => clearTimeout(t);
   }, [query]);
 
-  /* ===== RATINGS ===== */
   useEffect(() => {
     if (works.length === 0) return;
 
@@ -100,7 +97,6 @@ const Store = () => {
     });
   }, [works]);
 
-  /* ===== RENT ===== */
   const rent = async (workId: string) => {
     if (!(workId in selectedDuration)) return;
 
@@ -123,7 +119,6 @@ const Store = () => {
     setRentingId(null);
   };
 
-  /* ===== SEND ARTICLE ===== */
   const sendArticleToFriend = async (friendId: string) => {
     if (!shareWorkId) return;
 
@@ -200,7 +195,6 @@ const Store = () => {
                 </p>
               )}
 
-              {/* ⏱️ DURATION BUTTONS */}
               {!isOwn && !isRented && (
                 <div className="duration-options">
                   {DURATION_OPTIONS.map(opt => (
@@ -260,7 +254,6 @@ const Store = () => {
         })}
       </div>
 
-      {/* 📤 POPUP */}
       {shareWorkId &&
         createPortal(
           <div className="popup-overlay">

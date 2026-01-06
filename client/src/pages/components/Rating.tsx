@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import axios from 'axios';
 
 type Props = {
@@ -15,16 +16,29 @@ const Rating = ({
   userRating,
   onRated,
 }: Props) => {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [localRating, setLocalRating] =
+    useState<number | null>(null);
+
+  const effectiveRating =
+    userRating ?? localRating ?? average;
+
   const rate = async (value: number) => {
     if (userRating !== null) return;
 
-    await axios.post(
-      `/review/${workId}`,
-      { rating: value },
-      { withCredentials: true }
-    );
+    setLocalRating(value);
+    setHovered(null);
 
-    onRated();
+    try {
+      await axios.post(
+        `/review/${workId}`,
+        { rating: value },
+        { withCredentials: true }
+      );
+      onRated();
+    } catch {
+      setLocalRating(null);
+    }
   };
 
   return (
@@ -34,13 +48,21 @@ const Rating = ({
           <span
             key={n}
             onClick={() => rate(n)}
+            onMouseEnter={() =>
+              userRating === null &&
+              setHovered(n)
+            }
+            onMouseLeave={() => setHovered(null)}
             style={{
               cursor:
-                userRating === null ? 'pointer' : 'default',
+                userRating === null
+                  ? 'pointer'
+                  : 'default',
               color:
-                (userRating ?? average) >= n
+                (hovered ?? effectiveRating) >= n
                   ? '#facc15'
                   : '#d1d5db',
+              userSelect: 'none',
             }}
           >
             ★

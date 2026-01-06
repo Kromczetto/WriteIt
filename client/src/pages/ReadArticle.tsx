@@ -83,7 +83,6 @@ const ReadArticle = () => {
     }
   };
 
-  // 📄 PDF DOWNLOAD
   const downloadPdf = async () => {
     if (!id) return;
 
@@ -113,7 +112,7 @@ const ReadArticle = () => {
       link.remove();
 
       window.URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch {
       setError('PDF download failed');
     } finally {
       setPdfLoading(false);
@@ -121,58 +120,23 @@ const ReadArticle = () => {
   };
 
   if (loading) return <p>Loading...</p>;
-
-  if (locked) {
-    return (
-      <div className="paywall">
-        <h2>This article is locked</h2>
-        <p>You need to rent it to continue reading.</p>
-
-        {error && (
-          <p className="paywall-error">{error}</p>
-        )}
-
-        <div className="paywall-actions">
-          <button disabled={renting} onClick={() => rent(1)}>
-            Rent 1 day
-          </button>
-          <button disabled={renting} onClick={() => rent(7)}>
-            Rent 7 days
-          </button>
-          <button disabled={renting} onClick={() => rent(30)}>
-            Rent 30 days
-          </button>
-          <button
-            disabled={renting}
-            onClick={() => rent(null)}
-          >
-            Unlimited
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  if (locked) return <p>Locked</p>;
   if (!work) return null;
 
   return (
     <div className="article-container">
       <h1>{work.title}</h1>
 
-      {/* ⭐ OCENIANIE */}
       {rating && (
-        <div style={{ marginBottom: 20 }}>
-          <Rating
-            workId={work._id}
-            average={rating.average}
-            count={rating.count}
-            userRating={rating.userRating}
-            onRated={loadArticle}
-          />
-        </div>
+        <Rating
+          workId={work._id}
+          average={rating.average}
+          count={rating.count}
+          userRating={rating.userRating}
+          onRated={loadArticle}
+        />
       )}
 
-      {/* 📄 PDF */}
       <button
         className="pdf-btn"
         onClick={downloadPdf}
