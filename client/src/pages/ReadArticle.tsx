@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import Rating from './components/Rating';
 import '../css/ReadArticle.css';
 
 type Work = {
@@ -9,10 +10,17 @@ type Work = {
   content: string;
 };
 
+type RatingInfo = {
+  average: number;
+  count: number;
+  userRating: number | null;
+};
+
 const ReadArticle = () => {
   const { id } = useParams<{ id: string }>();
 
   const [work, setWork] = useState<Work | null>(null);
+  const [rating, setRating] = useState<RatingInfo | null>(null);
   const [locked, setLocked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [renting, setRenting] = useState(false);
@@ -27,6 +35,17 @@ const ReadArticle = () => {
 
       setWork(res.data);
       setLocked(false);
+
+      const ratingRes = await axios.get(
+        `/review/${id}`,
+        { withCredentials: true }
+      );
+
+      setRating({
+        average: ratingRes.data.average,
+        count: ratingRes.data.count,
+        userRating: ratingRes.data.userRating ?? null,
+      });
     } catch (err: any) {
       if (err.response?.status === 403) {
         setLocked(true);
@@ -56,17 +75,14 @@ const ReadArticle = () => {
       await loadArticle();
     } catch (err: any) {
       setError(
-        err?.response?.data?.message ||
-          'Rent failed'
+        err?.response?.data?.message || 'Rent failed'
       );
     } finally {
       setRenting(false);
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
 
   if (locked) {
     return (
@@ -79,22 +95,13 @@ const ReadArticle = () => {
         )}
 
         <div className="paywall-actions">
-          <button
-            disabled={renting}
-            onClick={() => rent(1)}
-          >
+          <button disabled={renting} onClick={() => rent(1)}>
             Rent 1 day
           </button>
-          <button
-            disabled={renting}
-            onClick={() => rent(7)}
-          >
+          <button disabled={renting} onClick={() => rent(7)}>
             Rent 7 days
           </button>
-          <button
-            disabled={renting}
-            onClick={() => rent(30)}
-          >
+          <button disabled={renting} onClick={() => rent(30)}>
             Rent 30 days
           </button>
           <button
@@ -113,6 +120,20 @@ const ReadArticle = () => {
   return (
     <div className="article-container">
       <h1>{work.title}</h1>
+
+      {/* ⭐ OCENIANIE */}
+      {rating && (
+        <div style={{ marginBottom: 20 }}>
+          <Rating
+            workId={work._id}
+            average={rating.average}
+            count={rating.count}
+            userRating={rating.userRating}
+            onRated={loadArticle}
+          />
+        </div>
+      )}
+
       <div
         className="article-content"
         dangerouslySetInnerHTML={{

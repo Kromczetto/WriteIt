@@ -52,6 +52,7 @@ const Store = () => {
   if (!context || !context.user) return null;
   const { user } = context;
 
+  /* ===== LOAD DATA ===== */
   useEffect(() => {
     axios.get('/api/works').then(res => setWorks(res.data));
     axios
@@ -62,6 +63,7 @@ const Store = () => {
       .then(res => setFriends(res.data));
   }, []);
 
+  /* ===== SEARCH ===== */
   useEffect(() => {
     if (query.trim().length < 2) return;
 
@@ -74,6 +76,7 @@ const Store = () => {
     return () => clearTimeout(t);
   }, [query]);
 
+  /* ===== RATINGS ===== */
   useEffect(() => {
     if (works.length === 0) return;
 
@@ -88,25 +91,39 @@ const Store = () => {
     ).then(results => {
       const map: Record<string, RatingInfo> = {};
       results.forEach(r => {
-        map[r.workId] = { average: r.average, count: r.count };
+        map[r.workId] = {
+          average: r.average,
+          count: r.count,
+        };
       });
       setRatings(map);
     });
   }, [works]);
 
+  /* ===== RENT ===== */
   const rent = async (workId: string) => {
+    if (!(workId in selectedDuration)) return;
+
     setRentingId(workId);
 
     await axios.post(
       `/api/rentals/${workId}`,
-      { days: selectedDuration[workId] ?? null },
+      { days: selectedDuration[workId] },
       { withCredentials: true }
     );
 
     setRentedIds(prev => [...prev, workId]);
+
+    setSelectedDuration(prev => {
+      const copy = { ...prev };
+      delete copy[workId];
+      return copy;
+    });
+
     setRentingId(null);
   };
 
+  /* ===== SEND ARTICLE ===== */
   const sendArticleToFriend = async (friendId: string) => {
     if (!shareWorkId) return;
 
@@ -123,7 +140,8 @@ const Store = () => {
     html.replace(/<[^>]+>/g, '').slice(0, 160) + '…';
 
   const renderStars = (avg: number) =>
-    '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+    '★'.repeat(Math.round(avg)) +
+    '☆'.repeat(5 - Math.round(avg));
 
   return (
     <div className="store-container">
@@ -142,6 +160,8 @@ const Store = () => {
           const isOwn = work.author._id === user.id;
           const isRented = rentedIds.includes(work._id);
           const rating = ratings[work._id];
+          const hasSelectedDuration =
+            work._id in selectedDuration;
 
           return (
             <div key={work._id} className="store-card">
@@ -158,20 +178,50 @@ const Store = () => {
                     </span>
                   </>
                 ) : (
-                  <span className="rating-text muted">No ratings</span>
+                  <span className="rating-text muted">
+                    No ratings
+                  </span>
                 )}
               </div>
 
-              <p className="store-preview">{preview(work.content)}</p>
+              <p className="store-preview">
+                {preview(work.content)}
+              </p>
 
               {isOwn && (
-                <p className="store-info">This is your article</p>
+                <p className="store-info">
+                  This is your article
+                </p>
               )}
 
               {isRented && !isOwn && (
                 <p className="store-info rented">
                   Already in your library
                 </p>
+              )}
+
+              {/* ⏱️ DURATION BUTTONS */}
+              {!isOwn && !isRented && (
+                <div className="duration-options">
+                  {DURATION_OPTIONS.map(opt => (
+                    <button
+                      key={opt.label}
+                      className={
+                        selectedDuration[work._id] === opt.days
+                          ? 'duration active'
+                          : 'duration'
+                      }
+                      onClick={() =>
+                        setSelectedDuration(prev => ({
+                          ...prev,
+                          [work._id]: opt.days,
+                        }))
+                      }
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               )}
 
               {isRented ? (
@@ -184,10 +234,16 @@ const Store = () => {
               ) : (
                 <button
                   className="rent-btn"
-                  disabled={isOwn}
+                  disabled={
+                    isOwn ||
+                    !hasSelectedDuration ||
+                    rentingId === work._id
+                  }
                   onClick={() => rent(work._id)}
                 >
-                  Rent article
+                  {rentingId === work._id
+                    ? 'Renting...'
+                    : 'Rent article'}
                 </button>
               )}
 
@@ -204,6 +260,7 @@ const Store = () => {
         })}
       </div>
 
+      {/* 📤 POPUP */}
       {shareWorkId &&
         createPortal(
           <div className="popup-overlay">
