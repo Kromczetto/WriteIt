@@ -81,7 +81,6 @@ const Friends = () => {
     <div className="friends-container">
       <h1 className="friends-title">Friends</h1>
 
-      {/* ADD FRIEND */}
       <div className="section">
         <h3>Add friend</h3>
         <div className="add-friend">
@@ -96,7 +95,6 @@ const Friends = () => {
         </div>
       </div>
 
-      {/* REQUESTS */}
       {requests.length > 0 && (
         <div className="section">
           <h3>Friend requests</h3>
@@ -124,7 +122,6 @@ const Friends = () => {
         </div>
       )}
 
-      {/* FRIENDS */}
       <div className="section">
         <h3>Your friends</h3>
 

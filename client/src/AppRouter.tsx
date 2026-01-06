@@ -99,7 +99,6 @@ const AppRouter = () => {
             }
           />
 
-          {/* ✅ JEDYNY CHAT ROUTE */}
           <Route
             path="/chat/:friendId"
             element={
