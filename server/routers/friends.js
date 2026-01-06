@@ -5,12 +5,14 @@ const {
   sendRequest,
   getRequests,
   acceptRequest,
-  getFriends
+  getFriends,
+  rejectRequest
 } = require('../controllers/friendController');
 
 router.post('/request', requireAuth, sendRequest);
 router.get('/requests', requireAuth, getRequests);
 router.post('/accept/:id', requireAuth, acceptRequest);
 router.get('/', requireAuth, getFriends);
+router.delete('/reject/:id', requireAuth, rejectRequest);
 
 module.exports = router;

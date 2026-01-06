@@ -1,7 +1,7 @@
 const FriendRequest = require('../models/FriendRequest');
 const User = require('../models/User');
 
-exports.sendRequest = async (req, res) => {
+sendRequest = async (req, res) => {
   const { email } = req.body;
   const to = await User.findOne({ email });
   if (!to) return res.status(404).json({ message: 'User not found' });
@@ -23,7 +23,7 @@ exports.sendRequest = async (req, res) => {
   res.json({ message: 'Friend request sent' });
 };
 
-exports.getRequests = async (req, res) => {
+getRequests = async (req, res) => {
   const requests = await FriendRequest.find({
     to: req.user.id,
     status: 'pending'
@@ -32,7 +32,7 @@ exports.getRequests = async (req, res) => {
   res.json(requests);
 };
 
-exports.acceptRequest = async (req, res) => {
+acceptRequest = async (req, res) => {
   const request = await FriendRequest.findById(req.params.id);
   if (!request || !request.to.equals(req.user.id)) {
     return res.sendStatus(403);
@@ -44,7 +44,7 @@ exports.acceptRequest = async (req, res) => {
   res.json({ message: 'Friend added' });
 };
 
-exports.getFriends = async (req, res) => {
+getFriends = async (req, res) => {
   const friends = await FriendRequest.find({
     status: 'accepted',
     $or: [
@@ -59,3 +59,16 @@ exports.getFriends = async (req, res) => {
     )
   );
 };
+
+rejectRequest = async (req, res) => {
+  const request = await FriendRequest.findById(req.params.id);
+
+  if (!request || !request.to.equals(req.user.id)) {
+    return res.sendStatus(403);
+  }
+
+  await request.deleteOne();
+  res.json({ message: 'Friend request rejected' });
+};
+
+module.exports = { sendRequest, getRequests, acceptRequest, getFriends, rejectRequest }

@@ -26,7 +26,7 @@ const areFriends = async (userId, friendId) => {
   return !!rel;
 };
 
-exports.getChat = async (req, res) => {
+getChat = async (req, res) => {
   try {
     const { friendId } = req.params;
 
@@ -58,7 +58,7 @@ exports.getChat = async (req, res) => {
   }
 };
 
-exports.sendMessage = async (req, res) => {
+sendMessage = async (req, res) => {
   try {
     const { friendId } = req.params;
     const { text, workId } = req.body;
@@ -92,3 +92,5 @@ exports.sendMessage = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+module.exports = { getChat, sendMessage };

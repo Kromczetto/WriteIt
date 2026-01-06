@@ -69,6 +69,14 @@ const Friends = () => {
     loadRequests();
   };
 
+  const rejectRequest = async (id: string) => {
+    await axios.delete(
+      `/api/friends/reject/${id}`,
+      { withCredentials: true }
+    );
+    loadRequests();
+  };
+
   return (
     <div className="friends-container">
       <h1 className="friends-title">Friends</h1>
@@ -102,6 +110,12 @@ const Friends = () => {
                     onClick={() => acceptRequest(r._id)}
                   >
                     Accept
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() => rejectRequest(r._id)}
+                  >
+                    Reject
                   </button>
                 </div>
               </li>
